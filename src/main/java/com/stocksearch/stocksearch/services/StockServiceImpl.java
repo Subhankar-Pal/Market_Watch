@@ -35,4 +35,11 @@ public class StockServiceImpl implements StockService{
 		stockDao.save(stock);
 		return stock;
 	}
+
+//@Override
+//public Stock addStock(List<Stock> list) {
+//	// TODO Auto-generated method stub
+//	stockDao.saveAll(list);
+//	return (Stock) list;
+//}
 }

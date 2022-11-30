@@ -1,5 +1,7 @@
 package com.stocksearch.stocksearch.controller1;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -7,16 +9,20 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stocksearch.stocksearch.helper.JwtUtil;
+import com.stocksearch.stocksearch.jwt.BadCredeltialsExceptions;
 import com.stocksearch.stocksearch.model.JwtRequest;
 import com.stocksearch.stocksearch.model.JwtResponse;
 import com.stocksearch.stocksearch.services.CustomAdminDetailsService;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class JwtController {
 	@Autowired
@@ -34,13 +40,16 @@ public class JwtController {
 		try {
 			this.authenticationmanager.authenticate(new UsernamePasswordAuthenticationToken(jwtRequest.getUsername(),jwtRequest.getPassword()));
 		}
-		catch(UsernameNotFoundException e) {
-			e.printStackTrace();
-			throw new Exception("Bad Creddentials");
-		}
+//		catch(UsernameNotFoundException e) {
+//		
+//			throw new Exception("Bad Credentials");
+//		}
 		catch(BadCredentialsException e) {
-			e.printStackTrace();
-			throw new Exception("Bad Creddentials");
+		
+			throw new BadCredeltialsExceptions("Bad Credentials");
+		}
+		catch(Exception e) {
+			throw new Exception(e);
 		}
 		
 		//file area
@@ -52,4 +61,13 @@ public class JwtController {
 		return ResponseEntity.ok(new JwtResponse(token));
 		
 	}
+	@RequestMapping(value = "/logout", method = RequestMethod.DELETE)
+    public @ResponseBody ResponseEntity<?> logout(HttpSession session){
+
+        String userName=(String)session.getAttribute("name");
+        System.out.println("name: " + userName);
+        session.invalidate();
+        return ResponseEntity.ok("user logged out");
+
+    } 
 }
